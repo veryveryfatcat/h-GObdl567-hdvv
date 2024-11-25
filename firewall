@@ -1,0 +1,43 @@
+$outputFile = "FirewallRules_Details.txt"
+
+function Export-FirewallRules {
+    $firewallRules = Get-NetFirewallRule | ForEach-Object {
+        $ruleDetails = @{
+            "Name"            = $_.DisplayName
+            "Description"     = $_.Description
+            "Direction"       = $_.Direction.ToString()
+            "Action"          = $_.Action.ToString()
+            "Enabled"         = if ($_.Enabled) { "Yes" } else { "No" }
+            "Profile"         = $_.Profile.ToString()
+            "Protocol"        = (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).Protocol
+            "LocalPort"       = (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort
+            "RemotePort"      = (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).RemotePort
+            "LocalAddress"    = (Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $_).LocalAddress
+            "RemoteAddress"   = (Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $_).RemoteAddress
+        }
+
+        [PSCustomObject]$ruleDetails
+    }
+
+    $formattedOutput = $firewallRules | Format-Table -AutoSize | Out-String
+
+    $separator = "=" * 80
+    $header = "FIREWALL RULES SUMMARY".PadLeft(40, " ")
+    $footer = "END OF FIREWALL RULES".PadLeft(40, " ")
+
+    $outputContent = @(
+        $separator
+        $header
+        $separator
+        $formattedOutput
+        $separator
+        $footer
+        $separator
+    ) -join "`n"
+
+    $outputContent | Out-File -FilePath $outputFile -Encoding UTF8
+
+    Write-Host "Firewall rule details have been saved to '$outputFile'." -ForegroundColor Green
+}
+
+Export-FirewallRules
