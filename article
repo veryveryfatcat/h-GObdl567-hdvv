@@ -1,0 +1,8 @@
+Brief summary of the article:
+
+This article, dated February 2, 2023, describes how Huntress detected an intrusion in a protected environment (Apache Tomcat Java web application server), related to a zero-day vulnerability in the GoAnywhere MFT software, later identified under the reference CVE-2023-0669. This vulnerability allowed remote code execution (RCE) via an exposed administration interface, enabling attackers to exploit the flaw to gain access to the system and execute malicious commands.
+
+The initial alert concerned the use of certutil to download a remote file, followed by the execution of this file via rundll32.exe. The investigation revealed that the malicious file, associated with a known malware named Truebot, was downloaded and executed to establish persistence on the system. This file was stored in a public directory (C:\Users\Public) to mask its activity.
+
+The scheduled tasks created to execute this malicious file mimicked NVIDIA crash reports, a technique commonly used by attackers to hide their actions and disguise themselves as legitimate processes.
+On February 7, 2023, Fortra, the provider of GoAnywhere, released a patch for this vulnerability, which is now fixed in version 7.1.2 and later.
